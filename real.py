@@ -40,7 +40,6 @@ backlight.switch_to_output()
 backlight.value = True
 
 
-clock = 0
 
 ScreenSize = (240, 240)
 BackGroundSize = (1000, 240)
@@ -65,6 +64,7 @@ for i in range(len(character_icons)):
     character_icons[i] = character_icons[i].resize((60, 60))
 
 # 상태 변수
+clock = 0
 selected_tab = 'background'
 selected_icon = 1
 last_spawn_time = [0, 0, 0]
@@ -434,15 +434,6 @@ class Enemy(Character):
         global characters
         self.frame += 1
         if self.state == 2:
-            """
-            frame
-            0-9: 사망1
-            10-19: 사망2
-            20-29: 사망3
-            30-39: 사망4
-            """
-            #print(self.frame // 10, len(self.img[self.state]))
-
             if self.frame // 4 >= len(self.img[self.state]):
                 characters.remove(self)
 
@@ -663,6 +654,7 @@ while True:
         draw.text((text_x, text_y - 40), "Press any key to restart", font=font, fill=(255, 0, 0))
         if button_A.is_pressed or button_B.is_pressed:
             isStart = False
+            isGameOver = False
 
     # 화면에 그리기
     disp.image(background)
