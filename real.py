@@ -8,12 +8,12 @@ from PIL import Image, ImageDraw, ImageFont
 from adafruit_rgb_display import st7789
 
 # 디스플레이 생성
-cs_pin = DigitalInOut(board.CE0)
-dc_pin = DigitalInOut(board.D25)
-reset_pin = DigitalInOut(board.D24)
+cs_pin = DigitalInOut(board.CE0) # 칩 선택
+dc_pin = DigitalInOut(board.D25) # 데이터/명령 선택
+reset_pin = DigitalInOut(board.D24) # 리셋 핀
 BAUDRATE = 24000000  # SPI 통신 속도
 
-spi = board.SPI()
+spi = board.SPI() # SPI 통신 초기화
 disp = st7789.ST7789(
     spi,
     height=240,
@@ -141,9 +141,9 @@ class Character:
             30-39: 사망3
             40-49: 사망4
             """
-            #print(self.frame // 10, len(self.img[self.state]))
+            #print(self.frame // 4, len(self.img[self.state]))
 
-            if self.frame // 5 >= len(self.img[self.state]):
+            if self.frame // 4 >= len(self.img[self.state]):
                 characters.remove(self)
 
         elif self.health <= 0:
@@ -163,7 +163,7 @@ class Character:
 
             if target:
                 self.state = 1
-                tick = self.frame // 10 % len(self.img[self.state])
+                tick = self.frame // 5 % len(self.img[self.state])
                 if tick == 6:
                     target.health -= self.power
             else:
@@ -454,7 +454,7 @@ class Enemy(Character):
                         target.append(c)
                 if len(target)>0:
                     self.state = 1
-                    tick = self.frame // 10 % len(self.img[self.state])
+                    tick = self.frame // 5 % len(self.img[self.state])
                     if tick == 0:
                         for t in target:
                             t.health -= self.power
@@ -472,7 +472,7 @@ class Enemy(Character):
 
                 if target:
                     self.state = 1
-                    tick = self.frame // 10 % len(self.img[self.state])
+                    tick = self.frame // 5 % len(self.img[self.state])
                     if tick == 4:
                         target.health -= self.power
                 else:
@@ -614,9 +614,10 @@ while True:
             lionSpawn = True
 
     # 배경 이미지
-    background = backgroundImage.copy()
+    background = backgroundImage.copy() # 원본 이미지를 변경하지 않도록 복사 저장
     draw = ImageDraw.Draw(background)
 
+    # 배경화면이 화면을 넘어가지 않도록 조정
     x_offset = max(min(x_offset, 0), ScreenSize[0] - BackGroundSize[0])
 
     # 캐릭터 그리기
@@ -628,7 +629,9 @@ while True:
     background = background.crop((-x_offset, 0, -x_offset + ScreenSize[0], ScreenSize[1]))
     draw = ImageDraw.Draw(background)
     for i in range(3):
+        # 각 아이콘의 위치와 크기 정의
         rect = (i * 80, ScreenSize[1] - 60, i * 80 + 80, ScreenSize[1] - 60 + 80)
+        # 각 아이콘 이미지 넣기, 투명유지를 위해 세번째 인자로 아이콘 이미지 전달
         background.paste(character_icons[i], rect[:2], character_icons[i])
         draw.rectangle((i * 80, ScreenSize[1] - 60, i * 80 + 80, ScreenSize[1]), outline=(255, 255, 255), width=1)
         draw.text((i * 80 + 53, ScreenSize[1] - 60), str(needGold[i]), fill=(160, 255, 186), font=font)
